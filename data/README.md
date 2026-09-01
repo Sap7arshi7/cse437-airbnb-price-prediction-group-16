@@ -1,5 +1,23 @@
+
 # Airbnb Price Prediction Using Machine Learning
 
+GitHub Repository:
+https://github.com/Sap7arshi7/cse437-airbnb-price-prediction-group-16
+
+## Dataset Usage
+
+The raw dataset is not included in this repository because the file size exceeds GitHub's 100 MB limit.
+
+The dataset can be downloaded from:
+
+Inside Airbnb:
+https://insideairbnb.com/get-the-data/
+
+After downloading, place the file inside:
+
+data/raw/listings.csv
+
+The raw dataset remains unchanged to maintain reproducibility.
 ## CSE437: Data Science
 
 Repository Name: cse437-airbnb-price-prediction-group-06
