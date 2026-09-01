@@ -1,0 +1,161 @@
+Feature,Importance
+neighbourhood_grouped_Ealing,0.3406731122618293
+accommodates,0.15975526671697546
+review_scores_checkin,0.07704250149458679
+bedrooms,0.06817716276253949
+bathrooms,0.05992343725919428
+review_scores_cleanliness,0.05396259616479103
+longitude,0.028822929211692706
+availability_60,0.023670189536966247
+has_wifi,0.021524021003319398
+latitude,0.020026099530377317
+calculated_host_listings_count_private_rooms,0.01528997454269034
+neighbourhood_grouped_Westminster,0.010383322577101364
+property_type_Shared room in condo,0.008001855752768308
+neighbourhood_grouped_Other,0.007979390520105536
+maximum_maximum_nights,0.007399655504847385
+number_of_reviews_ltm,0.006888223305704968
+number_of_reviews,0.00623479453893549
+reviews_per_month,0.006052707963636636
+minimum_nights,0.0054915918680032
+minimum_nights_avg_ntm,0.005241864841066106
+number_of_reviews_l30d,0.004833087240312198
+neighbourhood_grouped_Hackney,0.0047100428238317366
+has_smoke_alarm,0.004530327803851849
+review_scores_value,0.004217933083039696
+has_refrigerator,0.0037796616374045086
+estimated_occupancy_l365d,0.0028176394778279597
+has_hot_water,0.0026176902711438203
+property_type_Private room in island,0.002465156808196119
+has_kitchen,0.0023603756689207283
+hosts_time_as_host_years,0.0017705193842440347
+review_scores_rating,0.0016500397088054096
+property_type_Room in serviced apartment,0.0011246634481730097
+has_washer,0.0010595229581205677
+host_listings_count,0.0008693829216616192
+host_is_superhost,0.0007301158523950979
+minimum_minimum_nights,0.0006877215750147255
+availability_30,0.000654288575793253
+availability_eoy,0.0006202106771535902
+has_availability,0.0005656190067169853
+property_type_Entire villa,0.0005181521674226016
+neighbourhood_grouped_Islington,0.00041434059084901004
+number_of_reviews_ly,0.0004029056863229551
+hosts_time_as_user_years,0.0003914694981255823
+review_scores_communication,0.000351103486157224
+hosts_time_as_host_months,0.000317549682896346
+availability_90,0.0003103824316876614
+property_type_Casa particular,0.0002726450648822414
+has_bed_linens,0.0002627509156693762
+property_type_Entire rental unit,0.0002534444534362485
+neighbourhood_grouped_Kensington and Chelsea,0.0002511513392446855
+estimated_revenue_l365d,0.0002450859746071018
+property_type_Private room in tiny home,0.00023675599506074195
+property_type_Private room in hostel,0.0002157470112071536
+hosts_time_as_user_months,0.00021069223962895072
+property_type_Private room in lighthouse,0.00017461312127870545
+beds,0.00015705371255395406
+property_type_Private room in houseboat,0.00014851993236249407
+has_cooking_basics,0.00013413777074712036
+property_type_Private room in serviced apartment,0.0001289456729711849
+property_type_Room in hotel,0.00012581051612905916
+property_type_Camper/RV,0.000125295116154946
+property_type_Boat,8.466457974694406e-05
+calculated_host_listings_count_shared_rooms,8.434572939289409e-05
+has_dishes_and_silverware,8.156506270993362e-05
+calculated_host_listings_count_entire_homes,7.85723440197826e-05
+property_type_Island,7.250496640846768e-05
+property_type_Farm stay,7.169422877402671e-05
+property_type_Entire home,6.884980794966567e-05
+neighbourhood_grouped_Hammersmith and Fulham,6.796900381174408e-05
+neighbourhood_grouped_Southwark,6.221093081139632e-05
+calculated_host_listings_count,6.08187888577479e-05
+review_scores_location,6.0613987448346943e-05
+neighbourhood_grouped_Tower Hamlets,5.585906056735629e-05
+review_scores_accuracy,4.854539834922522e-05
+has_hair_dryer,3.564201200228282e-05
+neighbourhood_grouped_Lambeth,3.215991220695812e-05
+has_hot_water_kettle,3.0088373256859872e-05
+property_type_Campsite,2.8554438763070477e-05
+property_type_Entire vacation home,2.7308881989597923e-05
+has_carbon_monoxide_alarm,2.5769203064871633e-05
+host_identity_verified,2.275484050647475e-05
+property_type_Private room in camper/rv,2.0553084745160824e-05
+property_type_Lighthouse,1.712782860905062e-05
+property_type_Private room in cottage,1.5718028192194467e-05
+property_type_Tent,1.5600053200441807e-05
+has_hangers,1.5195864721437451e-05
+has_iron,1.5052652242057198e-05
+neighbourhood_grouped_Newham,1.4186011234964186e-05
+neighbourhood_grouped_Camden,1.1101613534938883e-05
+has_tv,9.905603267097717e-06
+property_type_Private room in guesthouse,8.61945018614868e-06
+neighbourhood_grouped_Wandsworth,7.237509502074375e-06
+property_type_Private room in yurt,4.137828051790664e-06
+property_type_Entire loft,3.894713791104887e-06
+property_type_Private room in townhouse,3.064731632893049e-06
+property_type_Shared room in hostel,5.704546517136764e-07
+availability_365,0.0
+property_type_Private room in condo,0.0
+property_type_Private room in castle,0.0
+property_type_Private room in chalet,0.0
+property_type_Private room in cabin,0.0
+property_type_Private room in bungalow,0.0
+property_type_Private room in boat,0.0
+property_type_Private room in bed and breakfast,0.0
+property_type_Houseboat,0.0
+property_type_Private room,0.0
+property_type_Hut,0.0
+property_type_Private room in casa particular,0.0
+property_type_Entire place,0.0
+property_type_Entire home/apt,0.0
+property_type_Entire serviced apartment,0.0
+property_type_Entire townhouse,0.0
+property_type_Entire chalet,0.0
+property_type_Entire cabin,0.0
+property_type_Entire bungalow,0.0
+property_type_Earthen home,0.0
+property_type_Entire guest suite,0.0
+property_type_Entire cottage,0.0
+property_type_Entire guesthouse,0.0
+property_type_Dome,0.0
+property_type_Castle,0.0
+property_type_Cave,0.0
+property_type_Cycladic home,0.0
+property_type_Entire condo,0.0
+property_type_Private room in hut,0.0
+property_type_Private room in home,0.0
+property_type_Private room in farm stay,0.0
+property_type_Private room in guest suite,0.0
+property_type_Room in rental unit,0.0
+property_type_Room in hostel,0.0
+property_type_Room in bed and breakfast,0.0
+property_type_Room in boutique hotel,0.0
+property_type_Room in aparthotel,0.0
+property_type_Riad,0.0
+property_type_Private room in villa,0.0
+property_type_Religious building,0.0
+property_type_Private room in shipping container,0.0
+property_type_Private room in treehouse,0.0
+property_type_Private room in vacation home,0.0
+property_type_Private room in loft,0.0
+property_type_Private room in nature lodge,0.0
+property_type_Private room in religious building,0.0
+property_type_Private room in rental unit,0.0
+property_type_Private room in shepherd's hut,0.0
+room_type_Private room,0.0
+room_type_Hotel room,0.0
+property_type_Tower,0.0
+property_type_Tiny home,0.0
+property_type_Shepherd’s hut,0.0
+property_type_Shared room in villa,0.0
+property_type_Shared room in townhouse,0.0
+property_type_Shared room in rental unit,0.0
+property_type_Shared room in bed and breakfast,0.0
+property_type_Shared room in loft,0.0
+property_type_Shared room in hotel,0.0
+property_type_Shared room in home,0.0
+property_type_Shared room in guesthouse,0.0
+room_type_Shared room,0.0
+neighbourhood_grouped_Brent,0.0
+neighbourhood_grouped_Lewisham,0.0
