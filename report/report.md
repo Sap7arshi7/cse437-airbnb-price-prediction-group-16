@@ -2,15 +2,11 @@
 
 ## CSE437: Data Science Project Report
 
----
-
 ### Course Information
 
 **Course:** CSE437 - Data Science  
 **Section:** 6  
-**Semester:** Summer 2026  
-
----
+**Semester:** Summer 2026
 
 ### Group Members
 
@@ -19,15 +15,9 @@
 | Saptarshi Barman | 22301750 |
 | Mahi Al Mahbub | 22101840 |
 
----
-
 ### GitHub Repository
 
-Repository Link:
-
-https://github.com/Sap7arshi7/cse437-airbnb-price-prediction-group-16
-
----
+[cse437-airbnb-price-prediction-group-16](https://github.com/Sap7arshi7/cse437-airbnb-price-prediction-group-16)
 
 ### Submission Date
 
@@ -35,376 +25,218 @@ https://github.com/Sap7arshi7/cse437-airbnb-price-prediction-group-16
 
 ---
 
-# Summary
+## Summary
 
-Airbnb has become one of the largest online accommodation platforms, where accurate pricing plays an important role in attracting customers and maximizing revenue. However, Airbnb listing prices depend on multiple interacting factors such as property characteristics, location, host information, availability, and review-related features. Due to these complex relationships, manually estimating suitable prices can be challenging.
+Airbnb has become one of the largest online accommodation platforms, where accurate pricing is important for attracting guests and supporting host revenue. However, listing prices depend on many interacting factors, including property characteristics, location, host information, availability, and reviews. These relationships make manual price estimation difficult.
 
-This project develops a machine learning-based regression system for predicting Airbnb listing prices using the London Airbnb Detailed Listings Dataset collected from Inside Airbnb. The project follows a complete data science workflow including data auditing, exploratory data analysis, preprocessing, feature engineering, model development, hyperparameter tuning, and error analysis.
+This project develops a machine-learning regression system for predicting Airbnb listing prices using the London Detailed Listings dataset from Inside Airbnb [1]. The work follows a complete data science workflow: data auditing, exploratory data analysis, preprocessing, feature engineering, baseline modeling, hyperparameter tuning, and error analysis. Data preparation was completed with pandas [3], while the regression models and evaluation workflow were implemented with scikit-learn [2].
 
-Several regression models were evaluated, including Linear Regression, Random Forest Regressor, and Gradient Boosting Regressor. After baseline comparison, Gradient Boosting was selected for hyperparameter optimization using Grid Search. The tuned Gradient Boosting model achieved the best performance with an MAE of 0.169968, RMSE of 0.268806, and R² score of 0.881761.
-
-The findings demonstrate that machine learning models can effectively capture complex relationships between Airbnb listing characteristics and pricing patterns.
+Three regression algorithms were evaluated: Linear Regression, Random Forest Regressor, and Gradient Boosting Regressor. The Gradient Boosting model was then optimized through three-fold grid-search cross-validation. The tuned model achieved the strongest test performance, with a mean absolute error (MAE) of 0.169968, root mean squared error (RMSE) of 0.268806, and R² score of 0.881761. These error values were calculated on the log-transformed price target. The results show that machine-learning models can capture much of the variation in London Airbnb listing prices, although high-priced listings remain more difficult to predict.
 
 ---
 
-# 1. Problem and Dataset
+## 1. Problem and Dataset
 
-## 1.1 Problem Statement
+### 1.1 Problem Statement
 
-Airbnb listing prices are influenced by multiple factors, including property characteristics, location, host information, availability, and review-related features. Due to the complexity of these factors, accurately estimating an appropriate listing price manually can be difficult.
+Airbnb listing prices are influenced by property capacity, room type, location, host characteristics, availability, and review information. Because these factors interact in nonlinear ways, accurately estimating an appropriate listing price manually can be difficult.
 
-This project aims to develop a machine learning-based regression system to predict Airbnb listing prices using real-world London Airbnb data. The project also investigates which features have the strongest relationship with listing prices and evaluates different machine learning models to identify the most accurate prediction approach.
+The objective of this project is to build a supervised regression system that predicts the price of a London Airbnb listing from its available attributes. The project also examines which features contribute most to the prediction, how the data-preparation steps support model development, and which evaluated model produces the lowest prediction error.
 
-The problem is formulated as a supervised regression task where the model learns the relationship between listing features and the corresponding price value.
+### 1.2 Dataset
 
----
+| Item | Details |
+|---|---|
+| Dataset | London Airbnb Detailed Listings Dataset |
+| Provider | Inside Airbnb |
+| Source | [Inside Airbnb: Get the Data](https://insideairbnb.com/get-the-data/) |
+| Raw size | 92,638 rows and 90 columns |
+| Rows retained after price cleaning | 62,240 |
 
-## 1.2 Dataset
+The dataset contains real-world information about property details, hosts, locations, room types, availability, reviews, amenities, and prices. It was suitable for this project because it contains numerical and categorical variables, missing values, skewed prices, and attributes that require careful preprocessing.
 
-### Dataset Name
+The raw file is expected at `data/raw/listings.csv`. It is kept unchanged so that the preprocessing workflow remains reproducible. Files generated by the preprocessing stage are stored in `data/processed/`.
 
-Inside Airbnb London Detailed Listings Dataset
+### 1.3 Target Variable
 
-### Source
+The prediction target is `log_price`. First, the original `price` text was converted to a numerical value by removing currency symbols and commas. Prices above the 99th percentile were capped to reduce the influence of extreme outliers. The final target was then calculated as:
 
-Inside Airbnb
+`log_price = log(1 + capped_price)`
 
-### Dataset URL
+The logarithmic transformation reduces right skew and helps the models learn the overall pricing pattern. Consequently, the reported MAE and RMSE values describe error on the transformed scale rather than error directly in pounds.
 
-https://insideairbnb.com/get-the-data/
+### 1.4 Research Questions
 
-### Dataset Description
-
-This project uses the London Airbnb Detailed Listings Dataset collected from Inside Airbnb.
-
-The dataset contains real-world Airbnb listing information including:
-
-- Property details
-- Host information
-- Location attributes
-- Availability information
-- Review-related features
-- Pricing information
-
-The dataset was selected because it represents a real-world unclean dataset containing missing values, numerical variables, categorical variables, and inconsistent data requiring preprocessing before applying machine learning algorithms.
-
-### Dataset Size
-
-The dataset contains a large collection of Airbnb listing records with multiple property, host, location, availability, review, and pricing-related attributes. This provides sufficient data for preprocessing, feature analysis, machine learning model training, and evaluation.
-
-The raw dataset is stored inside:
-data/raw/
-
-The processed datasets generated after preprocessing are stored inside:
-data/processed/
+1. Which property, location, host, and review-related features have the strongest relationship with Airbnb listing prices in London?
+2. How do data preprocessing and feature selection support the performance of Airbnb price-prediction models?
+3. Which machine-learning model provides the most accurate predictions after hyperparameter tuning, and what types of listings produce the largest errors?
 
 ---
 
-## 1.3 Target Variable
+## 2. Data Handling and Preprocessing
 
-The target variable used in this project is:
-log_price
+### 2.1 Data Quality Audit
 
-The original Airbnb price values were transformed using logarithmic scaling.
+The first stage examined the dataset dimensions, data types, missing values, duplicates, numerical summaries, and feature distributions. This audit identified completely empty columns, partially missing attributes, text-based price values, and variables that could create target leakage.
 
-The logarithmic transformation was applied because price data usually contains high-value outliers and a skewed distribution. Transforming the target variable reduces the impact of extreme values and improves model learning performance.
+![Top 20 features with missing values](../figures/missing_values.png)
 
-The final task is therefore a regression problem where machine learning models predict the transformed listing price.
+*Figure 1. Top 20 features with the highest missing-value percentages in the raw dataset.*
 
----
+The audit guided the later decisions to remove unusable fields, impute missing values, and exclude price-derived predictors.
 
-## 1.4 Research Questions
+### 2.2 Missing-Value Handling
 
-This project investigates the following three research questions:
+Listings with a missing or non-positive target price were removed because they could not be used for supervised training. Completely empty columns were also removed. For the remaining predictors:
 
-### Research Question 1
+- Missing numerical values were replaced with the median of the corresponding feature.
+- Missing categorical values were assigned the label `Unknown`.
+- A final check confirmed that the model input files contained no unresolved missing values.
 
-Which property, location, host, and review-related features have the strongest relationship with Airbnb listing prices in London?
+This approach retained useful rows while avoiding the loss of large portions of the dataset.
 
-### Research Question 2
+### 2.3 Data Cleaning and Transformation
 
-How do data preprocessing and feature selection affect the performance of Airbnb price prediction models?
+The main preprocessing operations were:
 
-### Research Question 3
+- converting price strings into numerical values;
+- capping prices at the 99th percentile and applying a `log1p` transformation;
+- removing identifiers, URLs, free-text fields, empty columns, and other unsuitable attributes;
+- converting selected amenity information into binary indicators;
+- grouping less frequent neighbourhoods under `Other`;
+- mapping binary true/false variables to 1 and 0;
+- one-hot encoding property type, room type, and grouped neighbourhood; and
+- removing price-derived features that could leak target information.
 
-Which machine-learning model provides the most accurate Airbnb price predictions after hyperparameter tuning, and what types of listings produce the largest prediction errors?
+These steps transformed the raw listings into a fully numerical dataset suitable for regression models.
 
----
+### 2.4 Train-Test Split
 
-# 2. Data Handling and Preprocessing
+The cleaned dataset was divided with `random_state=42` to make the split reproducible.
 
-## 2.1 Data Quality Audit
+| Subset | Percentage | Rows |
+|---|---:|---:|
+| Training set | 80% | 49,792 |
+| Test set | 20% | 12,448 |
+| Total | 100% | 62,240 |
 
-The first stage of the project involved analyzing the raw dataset to understand its structure and quality.
+The test set was kept separate from model fitting and hyperparameter selection. Three-fold cross-validation on the training set was later used during grid search.
 
-The data audit included:
+The generated files are:
 
-- Checking dataset dimensions
-- Identifying numerical and categorical features
-- Inspecting missing values
-- Understanding feature distributions
-- Detecting possible inconsistencies
+- `data/processed/X_train.csv`
+- `data/processed/X_test.csv`
+- `data/processed/y_train.csv`
+- `data/processed/y_test.csv`
 
-This step helped determine the required preprocessing operations before model training.
+### 2.5 Before and After Preprocessing
 
-![Missing Values Analysis](../figures/missing_values.png)
-
-**Figure 1: Missing Value Analysis**
-
-The missing value analysis helped identify incomplete attributes in the original dataset and guided the preprocessing decisions applied during data cleaning.
-
----
-
-## 2.2 Missing Value Handling
-
-The dataset contained missing values in several attributes. These missing values were handled during preprocessing to ensure that machine learning algorithms could process the data correctly.
-
-The preprocessing pipeline included:
-
-- Identifying missing values
-- Applying suitable handling techniques
-- Preparing clean input features
-
-After preprocessing, the processed dataset contained no unresolved missing values affecting model training.
-
----
-
-## 2.3 Data Cleaning and Transformation
-
-Several preprocessing operations were applied:
-
-- Removal of unnecessary attributes
-- Handling inconsistent values
-- Encoding categorical variables
-- Transforming numerical features
-- Preparing final input features
-
-Categorical variables were converted into numerical representations so that machine learning algorithms could process them.
-
----
-
-## 2.4 Train-Test Split
-
-The processed dataset was divided into training and testing subsets.
-
-The training data was used for:
-
-- Model learning
-- Feature analysis
-- Hyperparameter tuning
-
-The testing data was kept separate for final evaluation.
-
-Processed files generated:
-X_train.csv
-X_test.csv
-y_train.csv
-y_test.csv
-
----
-
-## 2.5 Before and After Preprocessing
-
-The preprocessing stage transformed the raw Airbnb listing data into a machine-learning-ready dataset.
-
-| Processing Step | Before | After |
+| Processing area | Before | After |
 |---|---|---|
-| Missing values | Present in raw dataset | Handled during preprocessing |
-| Categorical features | Text-based categories | Numerically encoded |
-| Unnecessary features | Included in raw dataset | Removed |
-| Feature leakage risk | Possible during raw preparation | Leakage-prone features removed |
-| Dataset format | Raw listing information | Processed dataset ready for model training |
+| Target price | Currency-formatted and skewed | Cleaned, capped, and log-transformed |
+| Missing values | Present in multiple features | Imputed or removed according to feature type |
+| Categorical features | Text-based categories | Binary or one-hot encoded |
+| Rare neighbourhoods | Many individual categories | Less frequent values grouped as `Other` |
+| Leakage risk | Price-derived predictors present | Leakage-prone predictors removed |
+| Model input | Raw listing information | 160 numerical predictors |
 
 ---
 
-# 3. Statistical Analysis
+## 3. Statistical Analysis
 
-## 3.1 Descriptive Statistics
+### 3.1 Descriptive Statistics
 
-Statistical analysis was performed to understand the distribution and characteristics of the dataset.
+Descriptive statistics, including the mean, standard deviation, minimum, maximum, and quartiles, were inspected for numerical variables. The raw price distribution showed a long right tail, supporting the decision to cap extreme values and transform the target.
 
-The analysis included:
+![Raw Airbnb price distribution](../figures/raw_price_distribution.png)
 
-- Mean values
-- Standard deviation
-- Minimum and maximum values
-- Feature distributions
+*Figure 2. Distribution of raw Airbnb listing prices before target transformation.*
 
-These statistical observations helped identify important patterns within Airbnb listing data.
+### 3.2 Feature-Relationship Analysis
 
-![Raw Price Distribution](../figures/raw_price_distribution.png)
+A correlation heatmap was used to inspect linear relationships among numerical variables. It helped identify groups of related availability, review, capacity, and host-listing features, although correlation alone does not establish causation or fully describe nonlinear effects.
 
-**Figure 2: Airbnb Price Distribution**
+![Numerical feature correlation heatmap](../figures/correlation_heatmap.png)
 
-The price distribution shows the original variation of Airbnb listing prices and explains the need for logarithmic transformation of the target variable.
+*Figure 3. Correlation heatmap for the numerical features in the raw dataset.*
 
----
+Room type also showed a clear pricing pattern. Entire homes or apartments had the highest median price, followed by hotel rooms, private rooms, and shared rooms.
 
-## 3.2 Feature Relationship Analysis
+![Median price by room type](../figures/price_by_room_type.png)
 
-Correlation analysis was performed to investigate relationships between numerical features.
+*Figure 4. Median Airbnb listing price for each room-type category.*
 
-The analysis focused on identifying relationships between:
+### 3.3 Statistical Observations
 
-- Property characteristics
-- Location-related variables
-- Availability information
-- Review-related attributes
-- Price-related features
+The exploratory analysis produced three main observations:
 
-Feature relationships provided an initial understanding of which variables may contribute significantly to Airbnb pricing.
-
-![Feature Correlation Heatmap](../figures/correlation_heatmap.png)
-
-**Figure 3: Feature Correlation Heatmap**
-
-The correlation heatmap shows relationships between numerical features and helps identify possible factors influencing Airbnb listing prices.
-
-![Price by Room Type](../figures/price_by_room_type.png)
-
-**Figure 4: Price Variation by Room Type**
-
-This visualization shows how different property types influence Airbnb listing prices.
+- prices were strongly right-skewed before transformation;
+- property capacity and location were important sources of price variation; and
+- several predictors had nonlinear or interacting relationships, supporting the use of tree-based ensemble models.
 
 ---
 
-## 3.3 Statistical Observations
+## 4. Feature Engineering
 
-The analysis showed that Airbnb prices are influenced by multiple factors rather than a single variable.
+### 4.1 Feature Preparation
 
-Important observations include:
+Feature engineering converted the cleaned data into a consistent numerical representation. Train and test columns were aligned in the same order, and any missing encoded category in the test set was added with a value of zero. Extreme night-limit fields and price-derived variables were reviewed and removed where they could introduce unstable or unrealistic patterns.
 
-- Property characteristics strongly affect pricing.
-- Location-related information contributes significantly to price variation.
-- Host and review-related information provides additional predictive value.
-- Complex relationships exist between multiple features, making machine learning suitable for this task.
+### 4.2 Feature Selection and Importance
 
----
-# 4. Feature Engineering
+The Gradient Boosting model's feature-importance values were used to inspect which predictors contributed most to its decisions. The strongest features included the Ealing neighbourhood indicator, accommodation capacity, check-in review score, number of bedrooms, number of bathrooms, and cleanliness review score.
 
-## 4.1 Feature Preparation
+![Top 15 feature importances](../figures/feature_importance_final.png)
 
-Feature engineering was performed to improve the quality of the input data and prepare the dataset for machine learning models.
+*Figure 5. Top 15 feature importances produced by the Gradient Boosting model.*
 
-The feature engineering process included:
+These importances are model-specific measures of predictive contribution; they should not be interpreted as proof that a feature directly causes a price change.
 
-- Reviewing feature importance
-- Removing unnecessary attributes
-- Selecting relevant variables
-- Preparing numerical and encoded categorical features
+### 4.3 Leakage Prevention
 
-The objective was to create a compact and informative feature set while reducing unnecessary complexity.
+Price-derived predictors, including quoted-price fields, were excluded from the final feature set. Without this step, a model could appear accurate by using information that would not be available in a realistic price-prediction setting. Preventing leakage therefore makes the test results more credible.
+
+### 4.4 Final Feature Set
+
+The final training and test matrices each contain 160 aligned numerical predictors. These files were used consistently by all baseline models, the grid search, and the final evaluation notebook.
 
 ---
 
-## 4.2 Feature Selection
+## 5. Modeling and Validation
 
-Feature selection was performed to identify the most useful features contributing to Airbnb price prediction.
+### 5.1 Validation Strategy
 
-The Gradient Boosting model was used to analyze feature importance and determine which variables had higher predictive contribution.
+All baseline models were trained on the 80% training subset and evaluated on the untouched 20% test subset. Hyperparameter selection used three-fold cross-validation within the training data. This separation reduced the risk of selecting parameters based directly on test-set performance and follows standard supervised-learning practice [4].
 
-Feature selection helps:
+### 5.2 Baseline Models
 
-- Reduce unnecessary information
-- Improve model efficiency
-- Reduce the possibility of overfitting
-- Improve model interpretation
+#### Linear Regression
 
-![Feature Importance](../figures/feature_importance_final.png)
+Linear Regression provided a simple reference model. It assumes an approximately linear relationship between the predictors and the log-transformed target.
 
-**Figure 5: Feature Importance Analysis**
+#### Random Forest Regressor
 
-The feature importance visualization shows the contribution of different features toward Airbnb price prediction. This analysis helps identify the variables with higher predictive influence.
+Random Forest combines many decision trees and averages their outputs. It can capture nonlinear relationships and interactions without requiring a linear feature relationship.
 
----
+#### Gradient Boosting Regressor
 
-## 4.3 Leakage Prevention
+Gradient Boosting builds trees sequentially, with each new tree focusing on errors made by the earlier trees. Although its untuned baseline did not outperform Random Forest, it was selected for grid search because its learning rate, tree depth, and number of estimators provide useful control over model complexity.
 
-During feature preparation, features that could introduce unrealistic prediction advantages were reviewed and removed.
+### 5.3 Evaluation Metrics
 
-Preventing data leakage ensures that the model learns genuine relationships between listing characteristics and prices instead of relying on information that would not be available during real-world prediction.
+#### Mean Absolute Error (MAE)
 
----
+MAE is the average absolute difference between the actual and predicted `log_price` values. Lower values indicate smaller average errors.
 
-## 4.4 Final Feature Set
+#### Root Mean Squared Error (RMSE)
 
-After preprocessing and feature engineering, the final dataset consisted of processed numerical and encoded categorical features.
+RMSE gives greater weight to large prediction errors. Lower values indicate better performance.
 
-The final processed feature matrices were:
-X_train.csv
-X_test.csv
+#### R² Score
 
-The final feature set was used for all machine learning models and evaluation experiments.
+R² measures the proportion of target variation explained by the model. Values closer to 1 indicate stronger predictive performance.
 
----
-
-# 5. Modeling and Validation
-
-## 5.1 Validation Strategy
-
-The project used a supervised regression approach.
-
-The dataset was divided into training and testing subsets. The training data was used for model development, while the testing data was reserved for final performance evaluation.
-
-The validation strategy ensured that the final model performance was measured on unseen data.
-
----
-
-## 5.2 Baseline Models
-
-Three machine learning regression models were evaluated:
-
-## Linear Regression
-
-Linear Regression was used as the baseline model to understand the relationship between input features and Airbnb prices.
-
-It provides a simple reference point for comparing more complex algorithms.
-
----
-
-## Random Forest Regressor
-
-Random Forest is an ensemble learning method that combines multiple decision trees.
-
-It can capture nonlinear relationships between Airbnb listing features and price values.
-
----
-
-## Gradient Boosting Regressor
-
-Gradient Boosting is an ensemble learning technique that builds multiple weak learners sequentially to improve prediction accuracy.
-
-This model was selected for further optimization because of its ability to handle complex feature relationships.
-
----
-
-## 5.3 Evaluation Metrics
-
-The following regression metrics were used:
-
-### Mean Absolute Error (MAE)
-
-MAE measures the average absolute difference between actual and predicted values.
-
-Lower MAE indicates better prediction accuracy.
-
-### Root Mean Squared Error (RMSE)
-
-RMSE measures prediction error while giving higher importance to larger errors.
-
-Lower RMSE indicates improved model performance.
-
-### R² Score
-
-R² measures how much variation in the target variable is explained by the model.
-
-A higher R² value indicates better predictive capability.
-
----
-
-## 5.4 Baseline Model Comparison
-
-The baseline model performance is shown below:
+### 5.4 Baseline Model Comparison
 
 | Model | MAE | RMSE | R² Score |
 |---|---:|---:|---:|
@@ -412,153 +244,107 @@ The baseline model performance is shown below:
 | Random Forest Regressor | 0.2107 | 0.3128 | 0.8399 |
 | Gradient Boosting Regressor | 0.2511 | 0.3481 | 0.8017 |
 
-The comparison shows that Random Forest provided strong baseline performance. However, Gradient Boosting was selected for further optimization using hyperparameter tuning.
+Random Forest produced the strongest untuned baseline. Gradient Boosting was nevertheless carried forward to determine whether systematic tuning could improve its performance beyond the baseline models.
 
 ---
 
-# 6. Hyperparameter Tuning
+## 6. Hyperparameter Tuning
 
-## 6.1 Tuning Method
+### 6.1 Tuning Method
 
-Hyperparameter tuning was performed using Grid Search Cross Validation.
+`GridSearchCV` evaluated eight Gradient Boosting configurations through three-fold cross-validation. Negative RMSE was used as the scoring function, so the selected configuration was the one with the lowest average validation RMSE.
 
-The objective was to identify the best combination of parameters for the Gradient Boosting model.
+### 6.2 Search Space
 
-Grid Search evaluates multiple parameter combinations and selects the configuration that provides the best validation performance.
-
----
-
-## 6.2 Search Space
-
-The following parameters were optimized:
-
-| Parameter | Values |
+| Parameter | Tested values |
 |---|---|
-| n_estimators | 100, 200 |
-| learning_rate | 0.05, 0.1 |
-| max_depth | 3, 5 |
+| `n_estimators` | 100, 200 |
+| `learning_rate` | 0.05, 0.1 |
+| `max_depth` | 3, 5 |
 
----
+### 6.3 Best Parameters
 
-## 6.3 Best Parameters
+| Parameter | Selected value |
+|---|---:|
+| `n_estimators` | 200 |
+| `learning_rate` | 0.1 |
+| `max_depth` | 5 |
 
-The optimized Gradient Boosting model selected the following parameters:
-n_estimators = 200
+### 6.4 Tuned Model Performance
 
-learning_rate = 0.1
-
-max_depth = 5
-
-These parameters produced the best validation performance among the tested combinations.
-
----
-
-## 6.4 Tuned Model Performance
-
-The tuned Gradient Boosting model achieved:
-
-| Metric | Score |
+| Metric | Test score |
 |---|---:|
 | MAE | 0.169968 |
 | RMSE | 0.268806 |
 | R² Score | 0.881761 |
 
-The tuned model significantly improved prediction accuracy compared to the baseline models.
+The tuned Gradient Boosting model improved on both its untuned baseline and the Random Forest baseline across all three metrics.
 
 ---
 
-# 7. Results, Visualization and Error Analysis
+## 7. Results, Visualizations, and Error Analysis
 
-## 7.1 Final Test Performance
+### 7.1 Final Test Performance
 
-The final selected model was the Tuned Gradient Boosting Regressor.
+The tuned Gradient Boosting Regressor was selected as the final model. Its R² score of 0.881761 indicates that it explained approximately 88.18% of the variation in the test-set `log_price` values. Because the target was transformed, this percentage describes variation on the log-price scale.
 
-The model achieved an R² score of 0.881761, meaning that approximately 88% of the variation in Airbnb prices was explained by the model.
+### 7.2 Actual versus Predicted Values
 
-The final results demonstrate that machine learning models can effectively predict Airbnb listing prices from real-world listing information.
+The actual-versus-predicted plot shows a strong positive alignment around the dashed equality line. The spread becomes wider for some high-price cases, indicating that the model is less consistent for unusual listings.
 
----
+![Actual versus predicted log prices](../figures/actual_vs_predicted.png)
 
-## 7.2 Prediction Visualization
+*Figure 6. Actual versus predicted log-transformed prices; the dashed line represents perfect predictions.*
 
-The actual versus predicted visualization was used to evaluate how closely the model predictions matched the real Airbnb prices.
+### 7.3 Residual Analysis
 
-![Actual vs Predicted](../figures/actual_vs_predicted.png)
+Residuals were calculated as actual `log_price` minus predicted `log_price`. Their mean was approximately 0.0010, which is close to zero and suggests little overall signed bias. However, a small number of high-priced listings produced much larger positive residuals, meaning that their prices were underestimated.
 
-**Figure 6: Actual vs Predicted Price Values**
+![Residual distribution](../figures/residual_distribution.png)
 
-The plot shows that most predictions follow the general trend of actual values, indicating that the tuned Gradient Boosting model successfully learned the relationship between input features and price values.
+*Figure 7. Distribution of residuals for the final model on the test set.*
 
----
+![Residuals versus predicted values](../figures/residual_error_analysis.png)
 
-## 7.3 Residual Analysis
+*Figure 8. Residuals plotted against predicted log-transformed prices; the dashed horizontal line marks zero error.*
 
-Residual analysis was performed to understand prediction errors.
+### 7.4 Answers to the Research Questions
 
-The residual distribution showed that most errors were centered around zero, indicating that the model did not show significant systematic bias.
-
-The largest errors mainly occurred for listings with extreme price values because these cases are less common and more difficult for the model to learn.
-
-![Residual Distribution](../figures/residual_distribution.png)
-
-**Figure 7: Residual Distribution**
-
-The residual distribution shows the difference between actual and predicted values. Most residuals are concentrated around zero, indicating limited prediction bias.
-
-![Residual Error Analysis](../figures/residual_error_analysis.png)
-
-**Figure 8: Residual Error Analysis**
-
-The error analysis highlights cases where the model produces larger prediction errors. These errors are mainly associated with unusual or extreme-price listings.
-
----
-
-## 7.4 Answers to Research Questions
-
-## Research Question 1
+#### Research Question 1
 
 **Which property, location, host, and review-related features have the strongest relationship with Airbnb listing prices in London?**
 
-The analysis showed that Airbnb prices are affected by multiple feature groups including property characteristics, location information, host-related variables, and review-related attributes. Feature importance analysis helped identify the variables contributing most strongly to price prediction.
+The model-specific importance analysis identified neighbourhood, accommodation capacity, check-in review score, bedrooms, bathrooms, cleanliness score, longitude, and availability among the leading predictors. Room-type medians also showed a clear price ordering, with entire homes or apartments having the highest median price.
+
+#### Research Question 2
+
+**How do data preprocessing and feature selection support the performance of Airbnb price-prediction models?**
+
+Preprocessing produced a complete numerical feature matrix by cleaning the target, imputing missing values, encoding categorical variables, grouping rare categories, and removing leakage-prone features. These operations made consistent model training possible and improved the credibility of the evaluation. However, the project did not perform a separate ablation study, so the individual performance gain from each preprocessing step cannot be quantified.
+
+#### Research Question 3
+
+**Which machine-learning model provides the most accurate predictions after hyperparameter tuning, and what types of listings produce the largest errors?**
+
+The tuned Gradient Boosting Regressor achieved the best overall performance, with an MAE of 0.169968, RMSE of 0.268806, and R² score of 0.881761. The largest absolute errors mainly occurred for listings with unusually high log-price values, which the model tended to underestimate.
 
 ---
 
-## Research Question 2
+## 8. Limitations and Next Steps
 
-**How do data preprocessing and feature selection affect the performance of Airbnb price prediction models?**
+The project has several limitations:
 
-Data preprocessing improved model performance by cleaning the dataset, handling missing values, encoding categorical variables, and preparing consistent input features. Feature selection reduced unnecessary information and helped the models focus on the most relevant attributes, improving efficiency and prediction quality.
+- The data represents London only, so the model may not generalize to other cities.
+- The dataset is a single market snapshot and does not explicitly model seasonal demand, special events, or economic changes.
+- MAE and RMSE are reported on the log-price scale and do not directly show average error in pounds.
+- High-priced and unusual listings remain harder to predict because comparable examples are less common.
+- The project did not use an ablation study to measure each preprocessing step independently.
 
----
-
-## Research Question 3
-
-**Which machine-learning model provides the most accurate Airbnb price predictions after hyperparameter tuning, and what types of listings produce the largest prediction errors?**
-
-The tuned Gradient Boosting Regressor provided the most accurate prediction performance with an R² score of 0.881761. The largest prediction errors occurred mainly for extreme-price listings where fewer training examples were available.
+Future work could include multiple cities, time-based validation, seasonal and event features, prediction intervals, error reporting after reversing the log transformation, and additional ensemble methods.
 
 ---
 
-# 8. Limitations and Next Steps
-
-Although the developed system achieved strong prediction performance, several limitations remain.
-
-First, the dataset represents Airbnb listings from London only, meaning the model may not directly generalize to other cities or markets.
-
-Second, external factors such as seasonal demand, special events, economic changes, and market trends were not included in the dataset.
-
-Third, extreme luxury listings may still produce larger prediction errors because these cases have fewer similar examples in the training data.
-
-Future improvements may include:
-
-- Using larger datasets from multiple locations
-- Including temporal pricing information
-- Adding external market factors
-- Exploring advanced ensemble learning approaches
-
----
-
-# 9. Contributions
+## 9. Contributions
 
 | Member | Student ID | Contribution |
 |---|---|---|
@@ -567,23 +353,20 @@ Future improvements may include:
 
 ---
 
-# Conclusion
+## 10. Conclusion
 
-This project developed a machine learning-based Airbnb price prediction system using real-world London Airbnb listing data. The complete workflow included data auditing, preprocessing, feature engineering, model comparison, hyperparameter tuning, and error analysis.
+This project developed a machine-learning regression system for predicting London Airbnb listing prices. The workflow covered data auditing, preprocessing, feature engineering, baseline comparison, hyperparameter tuning, and error analysis.
 
-Three regression models were evaluated, and the tuned Gradient Boosting Regressor achieved the best performance with an MAE of 0.169968, RMSE of 0.268806, and R² score of 0.881761.
-
-The results demonstrate that machine learning models can effectively capture complex relationships between Airbnb listing characteristics and pricing patterns. Future improvements can focus on incorporating additional market information, larger datasets, and advanced modeling techniques to further improve prediction accuracy.
+Among the evaluated models, the tuned Gradient Boosting Regressor achieved the strongest test performance, with an MAE of 0.169968, RMSE of 0.268806, and R² score of 0.881761 on the log-transformed target. The results demonstrate that property, location, capacity, and review-related information can explain a large share of the variation in listing prices. The residual analysis also shows that unusual high-price listings require further attention in future work.
 
 ---
 
-# References
+## References
 
-1. Inside Airbnb. Airbnb Dataset.  
-https://insideairbnb.com/get-the-data/
+[1] Inside Airbnb, “Get the Data.” [Online]. Available: [https://insideairbnb.com/get-the-data/](https://insideairbnb.com/get-the-data/). Accessed: Sep. 1, 2026.
 
-2. Pedregosa, F., Varoquaux, G., Gramfort, A., et al. (2011). Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research.
+[2] F. Pedregosa *et al*., “Scikit-learn: Machine Learning in Python,” *Journal of Machine Learning Research*, vol. 12, no. 85, pp. 2825–2830, 2011. [Online]. Available: [https://jmlr.org/papers/v12/pedregosa11a.html](https://jmlr.org/papers/v12/pedregosa11a.html).
 
-3. McKinney, W. (2010). Data Structures for Statistical Computing in Python.
+[3] W. McKinney, “Data Structures for Statistical Computing in Python,” in *Proceedings of the 9th Python in Science Conference (SciPy 2010)*, 2010, pp. 56–61, doi: [10.25080/Majora-92bf1922-00a](https://doi.org/10.25080/Majora-92bf1922-00a).
 
-4. Géron, A. (2019). Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow.
+[4] A. Géron, *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*, 2nd ed. Sebastopol, CA, USA: O’Reilly Media, 2019.
